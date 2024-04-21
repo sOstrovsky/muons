@@ -2,11 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import glob
+from typing import List
 
 
-def collect_data():
+def collect_data() -> List[List[float]]:
     # Создание пустого массива для хранения данных из файлов
-    all_data = []
+    result_data = []
 
     folder_path = './data'
 
@@ -16,15 +17,13 @@ def collect_data():
         with open(file_path, 'r') as file:
             data = file.readlines()
             data_array = np.array([np.array([float(num) for num in line.split()]) for line in data])
-            all_data.append(data_array)
+            result_data.append(data_array)
 
-    return all_data
+    return result_data
 
 
-if __name__ == '__main__':
-    all_data = collect_data()
-    # Подготовка данных для визуализации
-    dataset = {f'Данные_{i + 1}': data for i, data in enumerate(all_data)}
+def build_2d(all_data: List[List[float]]):
+    dataset = {f'Мюоны_{i + 1}': data for i, data in enumerate(all_data)}
 
     # Инициализация графика
     plt.figure(figsize=(12, 8))
@@ -35,10 +34,42 @@ if __name__ == '__main__':
 
     # Добавление подписей осей и легенды
     plt.xlabel('Индекс точки данных')
-    plt.ylabel('Значение данных')
-    plt.title('Визуализация нескольких наборов данных')
+    plt.ylabel('Значение мюонов')
+    plt.title('Визуализация наборов данных мюонов')
     plt.legend()
 
     # Отображение графика
     plt.grid(True)
     plt.show()
+
+
+def build_3d(all_data: List[List[float]]):
+    # Инициализация трехмерного графика для визуализации
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Построение трехмерной модели для данных из файлов
+    for i, data in enumerate(all_data):
+        x = data[:, 0]
+        y = data[:, 1]
+        z = data[:, 2]
+
+        ax.scatter(x, y, z, label=f'Мюоны {i + 1}', marker='o')
+
+    # Добавление подписей к осям
+    ax.set_xlabel('Энергия мюонов')
+    ax.set_ylabel('Угол наклона траектории мюонов')
+    ax.set_zlabel('Глубина проникновения мюонов в вещество')
+
+    # Отображение трехмерной модели
+    plt.title('3D Модель Мюонов')
+    plt.legend()
+    plt.show()
+
+
+if __name__ == '__main__':
+    collected_data = collect_data()
+
+    build_2d(collected_data)
+    build_3d(collected_data)
+
